@@ -1,0 +1,352 @@
+```PAINT SCRIPT
+
+
+
+--------------------
+--- PAINT SCRIPT ---
+--------------------
+
+
+
+
+
+
+--- SYMBOLS ---
+
+
+
+... -> one or more any parameter 
+
+ID -> identifier or IDENT
+
+VAL -> a literal or an ID
+
+NID -> numeric Identifier
+
+LAB -> a label example :main 
+
+
+
+
+
+
+--- COLOR TABLE ---
+
+
+       
+##     R   G   B     HEX
+ 0 ->  26  28  44  #1a1c2c
+ 1 ->  93  39  93  #5d275d
+ 2 -> 177  62  83  #b13e53
+ 3 -> 239 125  87  #ef7d57
+ 4 -> 255 205 117  #ffcd75
+ 5 -> 167 240 112  #a7f070
+ 6 ->  56 183 100  #38b764
+ 7 ->  37 113 121  #257179
+ 8 ->  41  54 111  #29366f
+ 9 ->  59  93 201  #3b5dc9
+10 ->  65 166 246  #41a6f6
+11 -> 115 239 247  #73eff7
+12 -> 244 244 244  #f4f4f4
+13 -> 148 176 194  #94b0c2
+14 ->  86 108 134  #566c86
+15 ->  51  60  87  #333c57
+
+
+
+
+
+
+say ...
+
+  prints a message.
+
+
+
+ask ID ...
+
+  prints a message and ask for string input
+  it puts the input in ID variable.
+
+
+
+push ...
+
+  push values in the stack.
+
+
+
+pop ...
+
+  pops values in the stack.
+
+ 
+
+set ID ...
+
+  sets ID if there are many values the 
+  result is a string with concatenated
+  values. this creates a new variable
+  if it doesnt exist yet.
+
+
+
+add ID ...
+
+  adds values to ID if there are many 
+  values the result is a string with 
+  concatenated values.
+
+
+
+sub NID ...
+
+  subtracts values to NID.
+
+
+
+mul NID ...
+
+  multiplies values to NID.
+
+
+
+div NID ...
+
+  divides NID with the values.
+
+
+   
+mod NID VAL
+
+  modulus division. 
+
+
+
+and NID VAL
+
+  bitwise and NID with VAL.
+
+
+
+or NID VAL
+
+  bitwise or NID with VAL.
+
+
+
+not NID VAL
+
+  bitwise not NID width VAL.
+
+
+
+jmp LAB
+
+  jumps to LAB.
+
+
+
+jeq LAB VAL0 VAL1
+
+  jumps to LAB if VAL0 equals VAL1.
+
+
+
+jne LAB VAL0 VAL1
+
+  jumps to LAB if VAL0 is not equal VAL1.
+
+
+
+jl LAB VAL0 VAL1
+
+  jumps to LAB if VAL0 is less than VAL1.
+
+
+
+
+jle LAB VAL0 VAL1 
+
+  jumps to LAB if VAL0 is less than 
+  or equal VAL1.
+
+
+
+jg LAB VAL0 VAL1
+
+  jumps to LAB if VAL0 is greater 
+  than VAL1.
+
+
+
+jge LAB VAL0 VAL1
+
+  jumps to LAB if VAL0 is greater 
+  than or equal VAL1.
+
+
+
+call LAB
+
+  gosub to LAB and returns with using RET.
+
+
+
+ret
+
+  returns to last call.
+
+
+
+rnd NID s e
+
+  generates a random integer from
+  s to e and put it in NID. 
+
+
+
+datetime Y M D h m s ms
+
+  gets todays date time. 
+
+
+
+int NID VAL
+
+  converts VAL to integer and put it
+  in NID.
+
+
+
+flt NID VAL
+
+  converts VAL to float and put it
+  in NID.
+
+
+
+str NID VAL
+
+  converts VAL to string and put it
+  in NID.
+
+
+
+end
+
+  quits program. 
+
+
+
+
+
+
+--- DRAWING COMMANDS ---
+
+
+
+fill -> 0 to 15
+
+outline -> 0 to 15
+
+width -> 1 to n
+
+
+
+line x0 y0 x1 y1 f w
+
+  draws a line from point x0,y0
+  to point x1,y1 with fill color of
+  f and line width of w.
+
+
+
+oval x0 y0 x1 y1 f o w
+
+  draws an oval inside a rectangle
+  from point x0,y0 to point x1,y1 
+  with fill color of f and an
+  outline color of o and line width of w.
+  must be x0<x1 and y0<y1.
+
+
+
+rect x0 y0 x1 y1 f o w
+
+  draws a rectangle from point x0,y0 
+  to point x1,y1 with fill color of f 
+  and an outline color of o and line 
+  width of w.
+  must be x0<x1 and y0<y1.
+
+
+
+arc x0 y0 x1 y1 s e f w
+
+  draws an arc inside a rectangle from
+  point x0,y0 to point x1,y1 that
+  starts from angle s and ends with
+  angle e with fill color f and a width
+  of w. angle starts with 
+  3o'clock clockwise. 
+  must be x0<x1 and y0<y1.
+
+
+
+chord x0 y0 x1 y1 s e f o w
+
+  draws a chord inside a rectangle from
+  point x0,y0 to point x1,y1 that
+  starts from angle s and ends with
+  angle e with fill color f and a width
+  of w. angle starts with 
+  3o'clock clockwise.
+  must be x0<x1 and y0<y1.
+
+
+
+pie x0 y0 x1 y1 s e f o w
+
+  draws a pie inside a rectangle from
+  point x0,y0 to point x1,y1 that
+  starts from angle s and ends with
+  angle e with fill color f and an
+  outline of o and a width of w. 
+  angle starts with 3o'clock clockwise.
+  must be x0<x1 and y0<y1.
+
+
+
+poly x0 y0 x1 y1 ... xn yn f o w
+
+  draws a polygon with points x0,y0 to
+  xn,yn with fill color f and an outline
+  color of o and a width of w. 
+
+
+
+clear f
+
+  clears canvas with fill color f.
+
+
+
+setsize w h
+
+  sets the size of canvas. 
+  w is the width h is the height.
+
+
+
+getsize w h
+
+  gets the size of canvas.
+  w is the width h is the height.
+
+
+
+
+
+
+```
