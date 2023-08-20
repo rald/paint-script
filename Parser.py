@@ -366,7 +366,6 @@ class Parser:
 
 
 
-
   def eval(self):
     self.begin_tag("eval") 
               
@@ -390,11 +389,12 @@ class Parser:
 
 
 
+
+
+
   def parse(self):
 
     self.read_labels()
-
-    
 
     while not self.quit and not self.get_type()==TokenType.EOF:
 
@@ -402,3 +402,9 @@ class Parser:
         self.next()
 
       self.eval()
+
+
+
+
+
+
