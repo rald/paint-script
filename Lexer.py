@@ -31,6 +31,10 @@ class Lexer(object):
           state=LexerState.LABEL
         elif c=='@':
           tokens.append(Token(ln,cl,TokenType.AT,c))  
+        elif c=='$':
+          tokens.append(Token(ln,cl,TokenType.DOLLAR,c))  
+        elif c=='%':
+          tokens.append(Token(ln,cl,TokenType.PERCENT,c))  
         elif c=='#':
           scl=cl
           i-=1
@@ -73,7 +77,10 @@ class Lexer(object):
           if c=='.': has_dot=True
           text+=c
         else:
-          tokens.append(Token(ln,scl,TokenType.FLOAT if has_dot else TokenType.INTEGER,text))
+          if has_dot:
+            tokens.append(Token(ln,scl,TokenType.FLOAT,float(text)))
+          else:
+            tokens.append(Token(ln,scl,TokenType.INTEGER,int(text)))          
           has_dot=False
           text=""
           i-=1
@@ -85,7 +92,11 @@ class Lexer(object):
           text+=c
         else:
           if text=='None':
-            tokens.append(Token(ln,scl,TokenType.NONE,text))
+            tokens.append(Token(ln,scl,TokenType.NONE,None))
+          elif text=='False':
+            tokens.append(Token(ln,scl,TokenType.FALSE,False))
+          elif text=='True':
+            tokens.append(Token(ln,scl,TokenType.TRUE,True))
           else:
             tokens.append(Token(ln,scl,TokenType.IDENT,text))
             

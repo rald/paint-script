@@ -24,4 +24,4 @@ clear 0
   sub y1 r
   add f 1  
   sub i 1
-  jgt start i 0
+  jg start i 0

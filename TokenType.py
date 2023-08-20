@@ -5,21 +5,27 @@ class TokenType(Enum):
   INTEGER = 1
   FLOAT = 2
   STRING = 3
-  IDENT = 4
+  FALSE = 4
+  TRUE = 5
 
-  OPEN_PAREN = 5
-  CLOSE_PAREN = 6
+  IDENT = 6
 
-  OPEN_BRACKET = 7
-  CLOSE_BRACKET = 8
+  OPEN_PAREN = 7
+  CLOSE_PAREN = 8
 
-  COLON = 9
-  NEW_LINE = 10
+  OPEN_BRACKET = 9
+  CLOSE_BRACKET = 10
+
+  COLON = 11
+  NEW_LINE = 12
   
-  LABEL = 11
-  AT = 12
+  LABEL = 13
 
-  COMMENT = 13
+  AT = 14
+  DOLLAR = 15
+  PERCENT = 16
 
-  EOF = 14
+  COMMENT = 17
+
+  EOF = 18
 

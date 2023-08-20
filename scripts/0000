@@ -1,0 +1,89 @@
+set xmax 100
+set ymax 100
+set cmax 15
+set x 0
+set y 0
+set xs 0.0
+set ys 0.0
+set l 0.0
+set t 0.0
+set xd 0.0
+set yd 0.0
+set zx 0.0
+set zy 0.0
+set cx 0.0
+set cy 0.0
+set tx 0.0
+set c 0
+
+set l -2.0
+set t 1.25
+set xd 2.5
+set yd -2.5
+
+set xs xd
+div xs xmax
+
+set ys yd
+div ys ymax
+
+set y 1
+:fory
+  set x 1
+  :forx
+    add x 1
+
+    set cx x
+    mul cx xs
+    add cx l
+
+    set cy y
+    mul cy ys
+    add cy t
+
+    set zx 0
+    set zy 0
+    set c 0
+
+    :wh10
+      set t0 zx
+      mul t0 t0
+      set t1 zy
+      mul t1 t1
+      add t0 t1
+
+      jge ew10 t0 4
+      jge ew10 c cmax
+
+      set tx0 zx
+      mul tx0 tx0
+      set ty0 zy
+      mul ty0 ty0
+      sub tx0 ty0
+      add tx0 cx
+
+      set t2 2
+      mul t2 zx zy
+      add t2 cy
+      set zy t2
+
+      set zx tx0
+      add c 1  
+
+      jmp wh10
+    :ew10
+
+    set x0 x
+    mul x0 2
+    set y0 y
+    mul y0 2
+    set x1 x0
+    add x1 2
+    set y1 y0
+    add y1 2
+
+    rect x0 y0 x1 y1 c None 0 
+
+    jle forx x xmax
+  add y 1
+  jle fory y ymax
