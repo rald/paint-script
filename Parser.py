@@ -562,6 +562,26 @@ class Parser:
 
 
 
+  def do_flt(self):
+    self.begin_tag("do_flt")
+    self.check(TokenType.IDENT,"flt")
+    token1=self.get_ident()
+    token2=self.get_number()
+    self.glo["VAR_"+token1.value]=Token(0,0,TokenType.FLOAT,float(token2.value))
+    self.end_tag("do_flt") 
+
+
+
+  def do_str(self):
+    self.begin_tag("do_str")
+    self.check(TokenType.IDENT,"str")
+    token1=self.get_ident()
+    token2=self.get_number()
+    self.glo["VAR_"+token1.value]=Token(0,0,TokenType.STRING,str(token2.value))
+    self.end_tag("do_str") 
+
+
+
   def do_sin(self):
     self.begin_tag("do_sin")
     self.check(TokenType.IDENT,"sin")
@@ -820,6 +840,10 @@ class Parser:
         self.do_jge()
       elif self.get_value()=="int":
         self.do_int()
+      elif self.get_value()=="flt":
+        self.do_flt()
+      elif self.get_value()=="str":
+        self.do_str()
       elif self.get_value()=="sin":
         self.do_sin()
       elif self.get_value()=="cos":

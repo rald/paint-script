@@ -82,4 +82,6 @@ set y 1
 
   jle fory y ymax
 
+globals
+
 end
