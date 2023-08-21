@@ -199,6 +199,13 @@ str ID NID
 
 
 
+rns ID SNID ENID
+
+  generates random integer from SNID to ENID
+  and stores it to ID.
+
+
+
 sin ID NID
 
   sine of NID and store it to ID.
