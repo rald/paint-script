@@ -650,7 +650,7 @@ class Parser:
     self.check(TokenType.IDENT,"tan")
     token1=self.get_ident_check()
     token2=self.get_number()
-    self.glo["VAR_"+token1.value]=Token(0,0,TokenType.FLOAT,math.cos(token2.value))
+    self.glo["VAR_"+token1.value]=Token(0,0,TokenType.FLOAT,math.tan(token2.value))
     self.end_tag("do_tan") 
 
 
