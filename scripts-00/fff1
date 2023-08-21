@@ -1,0 +1,11 @@
+set a "I love you"
+set b "a"
+set c "b"
+get d c 0
+say d		    # prints "c"   
+get d c 1
+say d		    # prints "b" 
+get d c 2
+say d		    # prints "a" 
+get d c 3
+say d		    # prints "I love you" 
