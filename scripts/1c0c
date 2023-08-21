@@ -35,12 +35,12 @@ datetime Y M D h m s ms
 set x 0
 set y 0
 set b h
+globals
 mod b 12
 call d10
 
 set rrr rr
 mul rrr 2
-
 
 set x rrr
 set y 0
@@ -49,6 +49,7 @@ div b 5
 int b b
 call d10
 
+globals
 end
 
 

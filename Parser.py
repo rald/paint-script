@@ -22,16 +22,11 @@ class Parser:
     self.tokens=tokens
     self.pc=0
     self.glo={}
-    self.prm=[]
-    self.lab={}
-    self.ret=[]
-    self.stk=[]    
     self.quit=False
 
-    self.glo["env"]=Token(0,0,TokenType.STRING,"")
     self.glo["debug"]=Token(0,0,TokenType.INTEGER,0)
+    self.glo["RET"]=[]
 
-    self.env=self.glo["env"]
 
     self.indent=0
 
@@ -81,10 +76,10 @@ class Parser:
     for i in range(len(self.tokens)):
       if self.tokens[i].type==TokenType.LABEL:
         label=self.tokens[i]
-        if label.value in self.lab:
+        if "LAB_"+label.value in self.glo:
           print(f"{self.tokens[i].line}:{self.tokens[i].column}:label redefined: {label.value}")
           quit()
-        self.glo["LABEL_"+label.value]=i;
+        self.glo["LAB_"+label.value]=Token(0,0,TokenType.INTEGER,i);
 
 
 
@@ -106,7 +101,7 @@ class Parser:
   def peek(self,offset):
     pos=self.pc+offset
     if pos<0 or pos>=len(self.tokens):
-      self.print(f"peek: offset out of bounds {pos}")
+      self.print(f"offset out of bounds {pos}")
       quit()
     return self.tokens[self.pc+offset]
 
@@ -125,6 +120,11 @@ class Parser:
       self.error(f"found '{self.get_value()}' expected {value}")  
     self.next()
     self.end_tag("check") 
+
+
+
+  def get_token(self):
+    return self.look()
 
 
 
@@ -148,16 +148,17 @@ class Parser:
   def get_none(self):
     self.begin_tag("get_none") 
     self.match(TokenType.NONE)
+    result=self.get_token()
     self.next()
     self.end_tag("get_none") 
-    return self.look() 
+    return result 
 
 
 
   def get_integer(self):
     self.begin_tag("get_integer") 
     self.match(TokenType.INTEGER)
-    result=self.look()
+    result=self.get_token()
     self.next()
     self.end_tag("get_integer") 
     return result
@@ -167,7 +168,7 @@ class Parser:
   def get_float(self):
     self.begin_tag("get_float") 
     self.match(TokenType.FLOAT)
-    result=self.look()
+    result=self.get_token()
     self.next()
     self.end_tag("get_float") 
     return result
@@ -177,7 +178,7 @@ class Parser:
   def get_string(self):
     self.begin_tag("get_string") 
     self.match(TokenType.STRING)
-    result=self.look()
+    result=self.get_token()
     self.next()
     self.end_tag("get_string") 
     return result
@@ -187,7 +188,7 @@ class Parser:
   def get_false(self):
     self.begin_tag("get_false") 
     self.match(TokenType.FALSE)
-    result=self.look()
+    result=self.get_token()
     self.next()
     self.end_tag("get_false") 
     return result
@@ -197,7 +198,7 @@ class Parser:
   def get_true(self):
     self.begin_tag("get_true") 
     self.match(TokenType.TRUE)
-    result=self.look()
+    result=self.get_token()
     self.next()
     self.end_tag("get_true") 
     return result
@@ -207,17 +208,19 @@ class Parser:
   def get_label(self):
     self.begin_tag("get_label") 
     self.match(TokenType.IDENT)
-    result=self.look()
+    result=self.get_token()
+    self.next()
     self.end_tag("get_label") 
     return result
+
 
 
   def get_label_check(self):
     self.begin_tag("get_label_check") 
     self.match(TokenType.IDENT)
-    label=self.look()
+    label=self.get_token()
     if "LAB_"+label.value not in self.glo:
-      self.error(f"undefined label {label_name}")
+      self.error(f"undefined label {label.value}")
     self.next()
     self.end_tag("get_label_check") 
     return label
@@ -227,7 +230,7 @@ class Parser:
   def get_ident(self):
     self.begin_tag("get_ident")
     self.match(TokenType.IDENT)
-    result=self.look()
+    result=self.get_token()
     self.next()
     self.end_tag("get_ident") 
     return result
@@ -237,7 +240,7 @@ class Parser:
   def get_ident_check(self):
     self.begin_tag("get_ident_check") 
     self.match(TokenType.IDENT)
-    ident=self.look()
+    ident=self.get_token()
     if "VAR_"+ident.value not in self.glo:
       self.error(f"get_ident_check: undefined identifier {ident.value}")
     self.next()
@@ -248,9 +251,33 @@ class Parser:
 
   def get_number(self):
     self.begin_tag("get_number")
-    result=None
-    if self.get_type()==TokenType.INTEGER or self.get_type()==TokenType.FLOAT:
-      result=self.look()
+    result=Token(0,0,TokenType.NONE,None)
+    if self.get_type() in [TokenType.INTEGER,TokenType.FLOAT]:
+      result=self.get_token()
+      self.next()
+    elif self.get_type()==TokenType.IDENT:
+      ident=self.get_ident_check()
+      result=self.glo["VAR_"+ident.value]
+      if result.type not in [TokenType.INTEGER,TokenType.FLOAT]:
+        self.error(f"found {result.type} expected INT or FLOAT")
+    else:
+      self.error(f"found {self.get_type()} expected INT or FLOAT")
+    self.end_tag("get_number") 
+    return result
+
+
+
+  def get_number_or_none(self):
+    self.begin_tag("get_number_or_none")
+    result=Token(0,0,TokenType.NONE,None)
+    if self.get_type() in [TokenType.INTEGER,TokenType.FLOAT,TokenType.NONE]:
+      result=self.get_token()
+      self.next()
+    elif self.get_type()==TokenType.IDENT:
+      ident=self.get_ident_check()
+      result=self.glo["VAR_"+ident.value]
+      if result.type not in [TokenType.INTEGER,TokenType.FLOAT,TokenType.NONE]:
+        self.error(f"found {result.type} expected INT or FLOAT")
     else:
       self.error(f"found {self.get_type()} expected INT or FLOAT")
     self.end_tag("get_number") 
@@ -260,20 +287,14 @@ class Parser:
 
   def get_atom(self):
     self.begin_tag("get_atom")
-    result=None 
-    if self.get_type()==TokenType.NONE or self.get_type()==TokenType.FALSE or self.get_type()==TokenType.TRUE or self.get_type()==TokenType.INTEGER or self.get_type()==TokenType.FLOAT or self.get_type()==TokenType.STRING:
-      result=self.look()
+    result=Token(0,0,TokenType.NONE,None)
+    if self.get_type() in [TokenType.NONE,TokenType.FALSE,TokenType.TRUE,TokenType.INTEGER,TokenType.FLOAT,TokenType.STRING]:
+      result=self.get_token()
     else:
       self.error(f"found {self.get_type()} expected ATOM")
     self.next()
     self.end_tag("get_atom") 
     return result
-
-
-
-  @staticmethod
-  def concat(token1,token2):
-    return Token(0,0,TokenType.STRING,str(token1.value)+str(token2.value))
   
       
 
@@ -282,8 +303,8 @@ class Parser:
 
   def do_set(self):
     self.begin_tag("do_set") 
-    result=""
     self.check(TokenType.IDENT,"set")
+    result=Token(0,0,TokenType.NONE,None)
     token1=self.get_ident()
     if self.get_type()==TokenType.IDENT:
       token2=self.get_ident_check()
@@ -305,7 +326,6 @@ class Parser:
 
   def do_get(self):
     self.begin_tag("do_get") 
-    token=None
     self.check(TokenType.IDENT,"get")
     token1=self.get_ident()
     if self.get_type()==TokenType.IDENT:
@@ -325,8 +345,8 @@ class Parser:
 
   def do_say(self):
     self.begin_tag("do_say") 
-    result=None
     self.check(TokenType.IDENT,"say")
+    result=Token(0,0,TokenType.NONE,None)
     if self.get_type()==TokenType.IDENT:
       ident=self.get_ident_check()
       result=self.glo["VAR_"+ident.value]
@@ -337,12 +357,250 @@ class Parser:
 
 
 
-  def do_end(self):
-    self.begin_tag("do_end") 
-    result=None
-    self.check(TokenType.IDENT,"end")
-    self.quit=True
-    self.end_tag("do_end") 
+  def do_add(self):
+    self.begin_tag("do_add")
+    self.check(TokenType.IDENT,"add")   
+    result=Token(0,0,TokenType.NONE,None)
+    ident=self.get_ident()
+    if "VAR_"+ident.value not in self.glo:
+      self.glo["VAR_"+ident.value]=Token(0,0,TokenType.INTEGER,0)
+    token1=self.glo["VAR_"+ident.value]
+    token2=self.get_number()
+    if token1.type==TokenType.FLOAT or token2.type==TokenType.FLOAT:
+      result=Token(0,0,TokenType.FLOAT,float(token1.value)+float(token2.value))
+    elif token1.type==TokenType.INTEGER and token2.type==TokenType.INTEGER:
+      result=Token(0,0,TokenType.INTEGER,int(token1.value)+int(token2.value))
+    else:
+      self.error(f"cannot add {token1.type} to {token2.type}")
+    self.glo["VAR_"+ident.value]=result
+    self.end_tag("do_add") 
+
+
+
+  def do_sub(self):
+    self.begin_tag("do_sub")
+    self.check(TokenType.IDENT,"sub")
+    result=Token(0,0,TokenType.NONE,None) 
+    ident=self.get_ident()
+    if "VAR_"+ident.value not in self.glo:
+      self.glo["VAR_"+ident.value]=Token(0,0,TokenType.INTEGER,0)
+    token1=self.glo["VAR_"+ident.value]
+    token2=self.get_number()
+    if token1.type==TokenType.FLOAT or token2.type==TokenType.FLOAT:
+      result=Token(0,0,TokenType.FLOAT,token1.value-token2.value)
+    elif token1.type==TokenType.INTEGER and token2.type==TokenType.INTEGER:
+      result=Token(0,0,TokenType.INTEGER,token1.value-token2.value)
+    else:
+      self.error(f"cannot sub {token1.type} to {token2.type}")
+    self.glo["VAR_"+ident.value]=result
+    self.end_tag("do_sub") 
+
+
+
+  def do_mul(self):
+    self.begin_tag("do_mul")
+    self.check(TokenType.IDENT,"mul")
+    result=Token(0,0,TokenType.NONE,None) 
+    ident=self.get_ident_check()
+    token1=self.glo["VAR_"+ident.value]
+    token2=self.get_number()
+    if token1.type==TokenType.FLOAT or token2.type==TokenType.FLOAT:
+      result=Token(0,0,TokenType.FLOAT,token1.value*token2.value)
+    elif token1.type==TokenType.INTEGER and token2.type==TokenType.INTEGER:
+      result=Token(0,0,TokenType.INTEGER,token1.value*token2.value)
+    else:
+      self.error(f"cannot mul {token1.type} to {token2.type}")
+    self.glo["VAR_"+ident.value]=result
+    self.end_tag("do_mul") 
+
+
+
+  def do_div(self):
+    self.begin_tag("do_div")
+    self.check(TokenType.IDENT,"div")
+    result=Token(0,0,TokenType.NONE,None) 
+    ident=self.get_ident_check()
+    token1=self.glo["VAR_"+ident.value]
+    token2=self.get_number()
+    if token2.value==0:
+      self.error("division by zero")      
+    elif token1.type in [TokenType.INTEGER,TokenType.FLOAT] and token2.type in [TokenType.INTEGER,TokenType.FLOAT]:
+      result=Token(0,0,TokenType.FLOAT,float(token1.value)/float(token2.value))
+    else:
+      self.error(f"cannot mod {token1.type} to {token2.type}")
+    self.glo["VAR_"+ident.value]=result
+    self.end_tag("do_div") 
+
+
+
+
+  def do_mod(self):
+    self.begin_tag("do_mod")
+    self.check(TokenType.IDENT,"mod")
+    result=Token(0,0,TokenType.NONE,None) 
+    ident=self.get_ident_check()
+    token1=self.glo["VAR_"+ident.value]
+    token2=self.get_integer()
+    if token2.value==0:
+      self.error("division by zero")
+    elif token1.type in [TokenType.INTEGER,TokenType.FLOAT] and token2.type in [TokenType.INTEGER,TokenType.FLOAT]:
+      result=Token(0,0,TokenType.INTEGER,int(token1.value)%int(token2.value))
+    else:
+      self.error(f"cannot mod {token1.type} to {token2.type}")
+    self.glo["VAR_"+ident.value]=result
+    self.end_tag("do_mod") 
+
+
+
+  def do_call(self):
+    self.begin_tag("do_call")
+    self.check(TokenType.IDENT,"call")
+    label=self.get_label_check()
+    self.glo["RET"].append(self.pc)
+    self.pc=self.glo["LAB_"+label.value].value
+    self.end_tag("do_call") 
+
+
+
+  def do_ret(self):
+    self.begin_tag("do_ret")
+    self.check(TokenType.IDENT,"ret")
+    self.pc=self.glo["RET"].pop()
+    self.end_tag("do_ret") 
+
+
+
+  def do_jmp(self):
+    self.begin_tag("do_jmp")
+    self.check(TokenType.IDENT,"jmp")
+    token1=self.get_label_check()
+    self.pc=self.glo["LAB_"+token1.value].value
+    self.end_tag("do_jmp") 
+
+
+
+  def do_je(self):
+    self.begin_tag("do_je")
+    self.check(TokenType.IDENT,"je")
+    token1=self.get_label_check()
+    token2=self.get_number()
+    token3=self.get_number()
+    if token2.value==token3.value:
+      self.pc=self.glo["LAB_"+token1.value].value
+    self.end_tag("do_je") 
+
+
+
+  def do_jne(self):
+    self.begin_tag("do_jne")
+    self.check(TokenType.IDENT,"jne")
+    token1=self.get_label_check()
+    token2=self.get_number()
+    token3=self.get_number()
+    if token2.value!=token3.value:
+      self.pc=self.glo["LAB_"+token1.value].value
+    self.end_tag("do_je") 
+
+
+
+  def do_jl(self):
+    self.begin_tag("do_jl")
+    self.check(TokenType.IDENT,"jl")
+    token1=self.get_label_check()
+    token2=self.get_number()
+    token3=self.get_number()
+    if token2.value<token3.value:
+      self.pc=self.glo["LAB_"+token1.value].value
+    self.end_tag("do_je") 
+
+
+
+  def do_jle(self):
+    self.begin_tag("do_jle")
+    self.check(TokenType.IDENT,"jle")
+    token1=self.get_label_check()
+    token2=self.get_number()
+    token3=self.get_number()
+    if token2.value<=token3.value:
+      self.pc=self.glo["LAB_"+token1.value].value
+    self.end_tag("do_jle") 
+
+
+
+  def do_jg(self):
+    self.begin_tag("do_jg")
+    self.check(TokenType.IDENT,"jg")
+    token1=self.get_label_check()
+    token2=self.get_number()
+    token3=self.get_number()
+    if token2.value>token3.value:
+      self.pc=self.glo["LAB_"+token1.value].value
+    self.end_tag("do_jg") 
+
+
+
+  def do_jge(self):
+    self.begin_tag("do_jge")
+    self.check(TokenType.IDENT,"jge")
+    token1=self.get_label_check()
+    token2=self.get_number()
+    token3=self.get_number()
+    if token2.value>=token3.value:
+      self.pc=self.glo["LAB_"+token1.value].value
+    self.end_tag("do_jge") 
+
+
+
+  def do_int(self):
+    self.begin_tag("do_int")
+    self.check(TokenType.IDENT,"int")
+    token1=self.get_ident()
+    token2=self.get_number()
+    self.glo["VAR_"+token1.value]=Token(0,0,TokenType.INTEGER,int(token2.value))
+    self.end_tag("do_int") 
+
+
+
+  def do_pset(self):
+    self.begin_tag("do_pset")
+    self.check(TokenType.IDENT,"pset")
+    x=self.get_number().value
+    y=self.get_number().value
+    s=self.get_number().value
+    f=self.get_number().value
+    print(f"pset {x} {y} {s} {f}")
+    self.draw.rectangle((x*s,y*s,x*s+s,y*s+s),pal[f])
+    self.end_tag("do_pset") 
+
+
+
+  def do_oval(self):
+    self.begin_tag("do_oval")
+    self.check(TokenType.IDENT,"oval")
+    x0=self.get_number().value
+    y0=self.get_number().value
+    x1=self.get_number().value
+    y1=self.get_number().value
+    f=self.get_number_or_none().value
+    o=self.get_number_or_none().value
+    w=self.get_number().value
+
+    print(f"oval {x0} {y0} {x1} {y1} {f} {o} {w}")
+
+    self.draw.ellipse((x0,y0,x1,y1),None if f is None else pal[f],None if o is None else pal[o],w)    
+    
+    self.end_tag("do_oval") 
+
+
+
+  def do_clear(self):
+    self.begin_tag("do_clear")
+    self.check(TokenType.IDENT,"clear")
+    f=self.get_number().value
+    w,h=self.img.size
+    print(f"clear {f}")
+    self.draw.rectangle((0,0,w,h),pal[f])
+    self.end_tag("do_clear") 
 
 
 
@@ -357,9 +615,33 @@ class Parser:
     self.begin_tag("do_globals") 
     self.check(TokenType.IDENT,"globals")
     for key in self.glo:
-      token=self.glo[key]
-      print(key,"=",f"\"{token.value}\"" if token.type==TokenType.STRING else token.value)
+      print(key,"=",self.glo[key])
     self.end_tag("do_globals") 
+
+
+
+  def do_datetime(self):
+    self.begin_tag("do_datetime")
+    self.check(TokenType.IDENT,"datetime")
+
+    now=datetime.now()
+
+    self.glo["VAR_"+self.get_ident().value]=Token(0,0,TokenType.INTEGER,now.year)
+    self.glo["VAR_"+self.get_ident().value]=Token(0,0,TokenType.INTEGER,now.month)
+    self.glo["VAR_"+self.get_ident().value]=Token(0,0,TokenType.INTEGER,now.day)
+    self.glo["VAR_"+self.get_ident().value]=Token(0,0,TokenType.INTEGER,now.hour)
+    self.glo["VAR_"+self.get_ident().value]=Token(0,0,TokenType.INTEGER,now.minute)
+    self.glo["VAR_"+self.get_ident().value]=Token(0,0,TokenType.INTEGER,now.second)
+    self.glo["VAR_"+self.get_ident().value]=Token(0,0,TokenType.INTEGER,now.microsecond)
+    self.end_tag("do_datetime") 
+
+
+
+  def do_end(self):
+    self.begin_tag("do_end") 
+    self.check(TokenType.IDENT,"end")
+    self.quit=True
+    self.end_tag("do_end") 
 
 
 
@@ -377,14 +659,53 @@ class Parser:
         self.do_get()
       elif self.get_value()=="say":
         self.do_say()
-      elif self.get_value()=="end":
-        self.do_end()
+      elif self.get_value()=="add":
+        self.do_add()
+      elif self.get_value()=="sub":
+        self.do_sub()
+      elif self.get_value()=="mul":
+        self.do_mul()
+      elif self.get_value()=="div":
+        self.do_div()
+      elif self.get_value()=="mod":
+        self.do_mod()
+      elif self.get_value()=="call":
+        self.do_call()
+      elif self.get_value()=="ret":
+        self.do_ret()
+      elif self.get_value()=="jmp":
+        self.do_jmp()
+      elif self.get_value()=="je":
+        self.do_je()
+      elif self.get_value()=="jne":
+        self.do_jne()
+      elif self.get_value()=="jl":
+        self.do_jl()
+      elif self.get_value()=="jle":
+        self.do_jle()
+      elif self.get_value()=="jg":
+        self.do_jg()
+      elif self.get_value()=="jge":
+        self.do_jge()
+      elif self.get_value()=="int":
+        self.do_int()
+      elif self.get_value()=="pset":
+        self.do_pset()
+      elif self.get_value()=="oval":
+        self.do_oval()
+      elif self.get_value()=="clear":
+        self.do_clear()
       elif self.get_value()=="debug":
         self.do_debug()
       elif self.get_value()=="globals":
         self.do_globals()
+      elif self.get_value()=="datetime":
+        self.do_datetime()
+      elif self.get_value()=="end":
+        self.do_end()
       else:
         self.error(f"invalid command {self.get_value()}")
+
     self.end_tag("eval") 
 
 
@@ -396,6 +717,9 @@ class Parser:
 
     self.read_labels()
 
+    for i in range(len(self.tokens)):
+      print(i,self.tokens[i])
+
     while not self.quit and not self.get_type()==TokenType.EOF:
 
       while self.get_type() in [TokenType.NEW_LINE,TokenType.LABEL,TokenType.COMMENT]:
@@ -403,6 +727,7 @@ class Parser:
 
       self.eval()
 
+    self.img.save(self.image_path)
 
 
 
