@@ -27,7 +27,7 @@ class Parser:
 
     self.glo["debug"]=Token(0,0,TokenType.INTEGER,0)
     self.glo["RET"]=[]
-
+    self.glo["STK"]=[]
 
     self.indent=0
 
@@ -307,6 +307,7 @@ class Parser:
       result=self.glo["VAR_"+ident.value]
     elif self.get_type() in [TokenType.NONE,TokenType.FALSE,TokenType.TRUE,TokenType.INTEGER,TokenType.FLOAT,TokenType.STRING]:
       result=self.get_token()
+      self.next()
     else:
       self.error(f"found {self.get_type()} expected VALUE")
     self.end_tag("get_number") 

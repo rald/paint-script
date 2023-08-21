@@ -1,0 +1,88 @@
+set pi 3.1416
+
+set f 12
+set w 3
+
+set h 0
+set x 320
+set y 240
+
+set dr 0
+set md 0
+set mh 0
+set ta 0
+set sd 0
+
+
+:main
+  clear 0
+
+  push 100
+  call star
+
+  end
+
+
+
+:star
+  pop sd
+  
+  set c 5
+  :forc 
+  
+    push sd
+    call move
+
+    push 144 
+    call turn
+
+    sub c 1
+    
+    jge forc c 0
+
+  ret
+
+
+
+:d2r
+  pop dr
+  mul dr pi
+  div dr 180  
+  push dr
+  ret
+
+
+
+:move
+  pop md
+  
+  push h
+  call d2r   
+  pop mh
+
+  set nx mh 
+  cos nx nx
+  mul nx md
+  add nx x
+
+  set ny mh
+  sin ny ny
+  mul ny md
+  add ny y
+
+  line x y nx ny f w 
+
+  set x nx
+  set y ny
+
+  ret
+
+
+
+:turn
+  pop ta
+  add h ta
+  ret
+
+
+
