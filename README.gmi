@@ -76,5 +76,126 @@ say ...
 
 
 
+add ID NID 
+
+  adds NID to ID and store it to ID.
 
 
+
+sub ID NID
+
+  subtracts NID to ID and store it to ID.
+
+
+
+mul ID NID
+
+  multiplies NID to ID and store it to ID.
+
+
+
+div ID NID
+
+  divides ID by NID and store it to ID.
+
+
+
+mod ID NID
+
+  modulus divide ID by NID and store it to ID.
+
+
+
+call LAB
+
+  gosub to LAB label return using ret.
+
+
+
+ret
+
+  return to caller.
+
+
+
+jmp LAB
+
+  goto LAB label.
+
+
+
+je LAB NID1 NID2
+
+  jump to LAB label if NID1 is equal to NID2.
+
+
+
+
+jne LAB NID1 NID2
+
+  jump to LAB label if NID1 is not equal to NID2.
+
+
+
+jl LAB NID1 NID2
+
+  jump to LAB label if NID1 is less than NID2.
+
+
+
+jle LAB NID1 NID2
+
+  jump to LAB label if NID1 is less than 
+  or equal to NID2.
+
+
+
+jg LAB NID1 NID2
+
+  jump to LAB label if NID1 is greater than NID2.
+
+
+
+jge LAB NID1 NID2
+
+  jump to LAB label if NID1 is greater than 
+  or equal to NID2.
+
+
+
+int ID NID
+
+  converts NID to INTEGER and store it to ID.
+
+
+
+flt ID NID
+
+  converts NID to FLOAT and store it to ID.
+
+
+
+str ID NID
+
+  converts NID to STRING and store it to ID.
+
+
+
+pset x y s f
+
+  draw a pixel to x,y with size of s and fill
+  color of f
+
+
+
+clear f
+
+  clears canvas with fill color of f.
+
+
+
+oval x0 y0 x1 y1 f o w
+
+  draws an oval inside a rectangle 
+  x0,y0 and x1,y1 with a fill color of f
+  and outline color of o and width of w

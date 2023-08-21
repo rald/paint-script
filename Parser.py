@@ -1,6 +1,7 @@
 import os
 import random 
 import PIL
+import math
 from PIL import Image, ImageDraw
 from datetime import datetime
 
@@ -561,6 +562,36 @@ class Parser:
 
 
 
+  def do_sin(self):
+    self.begin_tag("do_sin")
+    self.check(TokenType.IDENT,"sin")
+    token1=self.get_ident()
+    token2=self.get_number()
+    self.glo["VAR_"+token1.value]=Token(0,0,TokenType.FLOAT,math.sin(token2.value))
+    self.end_tag("do_sin") 
+
+
+
+  def do_cos(self):
+    self.begin_tag("do_cos")
+    self.check(TokenType.IDENT,"cos")
+    token1=self.get_ident()
+    token2=self.get_number()
+    self.glo["VAR_"+token1.value]=Token(0,0,TokenType.FLOAT,math.cos(token2.value))
+    self.end_tag("do_cos") 
+
+
+
+  def do_tan(self):
+    self.begin_tag("do_tan")
+    self.check(TokenType.IDENT,"tan")
+    token1=self.get_ident()
+    token2=self.get_number()
+    self.glo["VAR_"+token1.value]=Token(0,0,TokenType.FLOAT,math.cos(token2.value))
+    self.end_tag("do_tan") 
+
+
+
   def do_pset(self):
     self.begin_tag("do_pset")
     self.check(TokenType.IDENT,"pset")
@@ -569,8 +600,23 @@ class Parser:
     s=self.get_number().value
     f=self.get_number().value
     print(f"pset {x} {y} {s} {f}")
-    self.draw.rectangle((x*s,y*s,x*s+s,y*s+s),pal[f])
+    self.draw.rectangle((x*s,y*s,x*s+s,y*s+s),fill=pal[f])
     self.end_tag("do_pset") 
+
+
+
+  def do_line(self):
+    self.begin_tag("do_line")
+    self.check(TokenType.IDENT,"line")
+    x0=self.get_number().value
+    y0=self.get_number().value
+    x1=self.get_number().value
+    y1=self.get_number().value
+    f=self.get_number_or_none().value
+    w=self.get_number().value
+    print(f"line {x0} {y0} {x1} {y1} {f} {w}")
+    self.draw.line((x0,y0,x1,y1),fill=None if f is None else pal[f],width=w)
+    self.end_tag("do_line") 
 
 
 
@@ -584,12 +630,99 @@ class Parser:
     f=self.get_number_or_none().value
     o=self.get_number_or_none().value
     w=self.get_number().value
-
     print(f"oval {x0} {y0} {x1} {y1} {f} {o} {w}")
-
-    self.draw.ellipse((x0,y0,x1,y1),None if f is None else pal[f],None if o is None else pal[o],w)    
-    
+    self.draw.ellipse((x0,y0,x1,y1),fill=None if f is None else pal[f],outline=None if o is None else pal[o],width=w)
     self.end_tag("do_oval") 
+
+
+
+  def do_rect(self):
+    self.begin_tag("do_rect")
+    self.check(TokenType.IDENT,"rect")
+    x0=self.get_number().value
+    y0=self.get_number().value
+    x1=self.get_number().value
+    y1=self.get_number().value
+    f=self.get_number_or_none().value
+    o=self.get_number_or_none().value
+    w=self.get_number().value
+    print(f"rect {x0} {y0} {x1} {y1} {f} {o} {w}")
+    self.draw.rectangle((x0,y0,x1,y1),fill=None if f is None else pal[f],outline=None if o is None else pal[o],width=w)
+    self.end_tag("do_rect") 
+
+
+
+  def do_arc(self):
+    self.begin_tag("do_arc")
+    self.check(TokenType.IDENT,"arc")
+    x0=self.get_number().value
+    y0=self.get_number().value
+    x1=self.get_number().value
+    y1=self.get_number().value
+    s=self.get_number().value
+    e=self.get_number().value       
+    f=self.get_number_or_none().value
+    w=self.get_number().value
+    print(f"arc {x0} {y0} {x1} {y1} {f} {o} {w}")
+    self.draw.rectangle((x0,y0,x1,y1),start=s,end=e,fill=None if f is None else pal[f],width=w)    
+    self.end_tag("do_arc") 
+
+
+
+  def do_chord(self):
+    self.begin_tag("do_chord")
+    self.check(TokenType.IDENT,"chord")
+    x0=self.get_number().value
+    y0=self.get_number().value
+    x1=self.get_number().value
+    y1=self.get_number().value
+    s=self.get_number().value
+    e=self.get_number().value       
+    f=self.get_number_or_none().value
+    w=self.get_number().value
+    print(f"chord {x0} {y0} {x1} {y1} {f} {o} {w}")
+    self.draw.chord((x0,y0,x1,y1),start=s,end=e,fill=None if f is None else pal[f],width=w)    
+    self.end_tag("do_chord") 
+
+
+
+  def do_pie(self):
+    self.begin_tag("do_pie")
+    self.check(TokenType.IDENT,"pie")
+    x0=self.get_number().value
+    y0=self.get_number().value
+    x1=self.get_number().value
+    y1=self.get_number().value
+    s=self.get_number().value
+    e=self.get_number().value       
+    f=self.get_number_or_none().value
+    w=self.get_number().value
+    print(f"pie {x0} {y0} {x1} {y1} {f} {o} {w}")
+    self.draw.pieslice((x0,y0,x1,y1),start=s,end=e,fill=None if f is None else pal[f],width=w)    
+    self.end_tag("do_pie") 
+
+
+
+  def do_poly(self):
+    self.begin_tag("do_poly")
+    self.check(TokenType.IDENT,"poly")
+    start=self.pc
+    count=0
+    while self.get_type() not in [TokenType.NEW_LINE,TokenType.EOF]:
+      count+=1
+    self.pc=start
+    p=[]
+    for _ in range(0,count-3,2):
+      p.append(
+        self.get_number().value,
+        self.get_number().value
+      )
+    f=self.get_number_or_none().value
+    o=self.get_number_or_none().value
+    w=self.get_number().value
+    print(f"poly {p} {f} {o} {w}")
+    self.draw.polygon(p,fill=None if f is None else pal[f],outline=None if o is None else pal[o],width=w)
+    self.end_tag("do_poly") 
 
 
 
@@ -599,7 +732,7 @@ class Parser:
     f=self.get_number().value
     w,h=self.img.size
     print(f"clear {f}")
-    self.draw.rectangle((0,0,w,h),pal[f])
+    self.draw.rectangle((0,0,w,h),fill=pal[f])
     self.end_tag("do_clear") 
 
 
@@ -623,9 +756,7 @@ class Parser:
   def do_datetime(self):
     self.begin_tag("do_datetime")
     self.check(TokenType.IDENT,"datetime")
-
     now=datetime.now()
-
     self.glo["VAR_"+self.get_ident().value]=Token(0,0,TokenType.INTEGER,now.year)
     self.glo["VAR_"+self.get_ident().value]=Token(0,0,TokenType.INTEGER,now.month)
     self.glo["VAR_"+self.get_ident().value]=Token(0,0,TokenType.INTEGER,now.day)
@@ -689,10 +820,28 @@ class Parser:
         self.do_jge()
       elif self.get_value()=="int":
         self.do_int()
+      elif self.get_value()=="sin":
+        self.do_sin()
+      elif self.get_value()=="cos":
+        self.do_cos()
+      elif self.get_value()=="tan":
+        self.do_tan()
       elif self.get_value()=="pset":
         self.do_pset()
+      elif self.get_value()=="line":
+        self.do_line()
       elif self.get_value()=="oval":
         self.do_oval()
+      elif self.get_value()=="rect":
+        self.do_rect()
+      elif self.get_value()=="arc":
+        self.do_arc()
+      elif self.get_value()=="chord":
+        self.do_chord()
+      elif self.get_value()=="pie":
+        self.do_pie()
+      elif self.get_value()=="poly":
+        self.do_poly()
       elif self.get_value()=="clear":
         self.do_clear()
       elif self.get_value()=="debug":
