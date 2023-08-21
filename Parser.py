@@ -308,7 +308,7 @@ class Parser:
     elif self.get_type() in [TokenType.NONE,TokenType.FALSE,TokenType.TRUE,TokenType.INTEGER,TokenType.FLOAT,TokenType.STRING]:
       result=self.get_token()
     else:
-      self.error(f"found {self.get_type()} expected VALUE')
+      self.error(f"found {self.get_type()} expected VALUE")
     self.end_tag("get_number") 
     return result
 
@@ -587,7 +587,7 @@ class Parser:
   def do_int(self):
     self.begin_tag("do_int")
     self.check(TokenType.IDENT,"int")
-    token1=self.get_ident()
+    token1=self.get_ident_check()
     token2=self.get_number()
     self.glo["VAR_"+token1.value]=Token(0,0,TokenType.INTEGER,int(token2.value))
     self.end_tag("do_int") 
@@ -597,7 +597,7 @@ class Parser:
   def do_flt(self):
     self.begin_tag("do_flt")
     self.check(TokenType.IDENT,"flt")
-    token1=self.get_ident()
+    token1=self.get_ident_check()
     token2=self.get_number()
     self.glo["VAR_"+token1.value]=Token(0,0,TokenType.FLOAT,float(token2.value))
     self.end_tag("do_flt") 
@@ -607,17 +607,28 @@ class Parser:
   def do_str(self):
     self.begin_tag("do_str")
     self.check(TokenType.IDENT,"str")
-    token1=self.get_ident()
+    token1=self.get_ident_check()
     token2=self.get_number()
     self.glo["VAR_"+token1.value]=Token(0,0,TokenType.STRING,str(token2.value))
     self.end_tag("do_str") 
 
 
 
+  def do_rnd(self):
+    self.begin_tag("do_rnd")
+    self.check(TokenType.IDENT,"rnd")
+    token1=self.get_ident_check()
+    token2=self.get_number()
+    token3=self.get_number()
+    self.glo["VAR_"+token1.value]=Token(0,0,TokenType.INTEGER,random.randint(token2.value,token3.value))
+    self.end_tag("do_rnd") 
+
+
+
   def do_sin(self):
     self.begin_tag("do_sin")
     self.check(TokenType.IDENT,"sin")
-    token1=self.get_ident()
+    token1=self.get_ident_check()
     token2=self.get_number()
     self.glo["VAR_"+token1.value]=Token(0,0,TokenType.FLOAT,math.sin(token2.value))
     self.end_tag("do_sin") 
@@ -627,7 +638,7 @@ class Parser:
   def do_cos(self):
     self.begin_tag("do_cos")
     self.check(TokenType.IDENT,"cos")
-    token1=self.get_ident()
+    token1=self.get_ident_check()
     token2=self.get_number()
     self.glo["VAR_"+token1.value]=Token(0,0,TokenType.FLOAT,math.cos(token2.value))
     self.end_tag("do_cos") 
@@ -637,7 +648,7 @@ class Parser:
   def do_tan(self):
     self.begin_tag("do_tan")
     self.check(TokenType.IDENT,"tan")
-    token1=self.get_ident()
+    token1=self.get_ident_check()
     token2=self.get_number()
     self.glo["VAR_"+token1.value]=Token(0,0,TokenType.FLOAT,math.cos(token2.value))
     self.end_tag("do_tan") 
@@ -880,6 +891,8 @@ class Parser:
         self.do_flt()
       elif self.get_value()=="str":
         self.do_str()
+      elif self.get_value()=="rnd":
+        self.do_rnd()
       elif self.get_value()=="sin":
         self.do_sin()
       elif self.get_value()=="cos":
@@ -926,8 +939,10 @@ class Parser:
 
     self.read_labels()
 
+    """
     for i in range(len(self.tokens)):
       print(i,self.tokens[i])
+    """
 
     while not self.quit and not self.get_type()==TokenType.EOF:
 
