@@ -57,18 +57,18 @@ end
 add x ox
 add y oy
 
-jeq b0 b 0
-jeq b1 b 1
-jeq b2 b 2
-jeq b3 b 3
-jeq b4 b 4
-jeq b5 b 5
-jeq b6 b 6
-jeq b7 b 7
-jeq b8 b 8
-jeq b9 b 9
-jeq b10 b 10
-jeq b11 b 11
+je b0 b 0
+je b1 b 1
+je b2 b 2
+je b3 b 3
+je b4 b 4
+je b5 b 5
+je b6 b 6
+je b7 b 7
+je b8 b 8
+je b9 b 9
+je b10 b 10
+je b11 b 11
 end
 
 :b0
