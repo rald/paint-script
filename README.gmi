@@ -8,13 +8,16 @@
 --------------------
 --- PAINT SCRIPT ---
 --------------------
+---  FriaElAgua  ---
+---     2023     ---
+--------------------
 
 
 
 
 
 
---- COLOR TABLE ---
+--- SWEETIE-16 COLOR PALETTE by GrafxKid ---
 
 
        
@@ -166,6 +169,18 @@ jge LAB NID1 NID2
 
 
 
+push ...
+
+  pushes values to the stack.
+
+
+
+pop ...
+
+  pops values from the stack.
+
+
+
 int ID NID
 
   converts NID to INTEGER and store it to ID.
@@ -272,6 +287,8 @@ poly x0 y0 ... xn yn f o w
   draws a polygon from x0,y0 to xn,yn 
   fill color of f and and outline color 
   of o and width of w.
+
+
 
 
 

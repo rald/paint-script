@@ -299,6 +299,18 @@ class Parser:
   
       
 
+  def get_any(self):
+    self.begin_tag("get_number_or_none")
+    result=Token(0,0,TokenType.NONE,None)
+    if self.get_type()==TokenType.IDENT:
+      ident=self.get_ident_check()
+      result=self.glo["VAR_"+ident.value]
+    elif self.get_type() in [TokenType.NONE,TokenType.FALSE,TokenType.TRUE,TokenType.INTEGER,TokenType.FLOAT,TokenType.STRING]:
+      result=self.get_token()
+    else:
+      self.error(f"found {self.get_type()} expected VALUE')
+    self.end_tag("get_number") 
+    return result
 
 
 
@@ -549,6 +561,26 @@ class Parser:
     if token2.value>=token3.value:
       self.pc=self.glo["LAB_"+token1.value].value
     self.end_tag("do_jge") 
+
+
+
+  def do_push(self):
+    self.begin_tag("do_push")
+    self.check(TokenType.IDENT,"push") 
+    while self.get_type() not in [TokenType.NEW_LINE,TokenType.EOF]:
+      token=self.get_any()
+      self.glo["STK"].append(token)
+    self.end_tag("do_push") 
+
+
+
+  def do_pop(self):
+    self.begin_tag("do_pop")
+    self.check(TokenType.IDENT,"pop") 
+    while self.get_type() not in [TokenType.NEW_LINE,TokenType.EOF]:
+      ident=self.get_ident_check()
+      self.glo["VAR_"+ident.value]=self.glo["STK"].pop()
+    self.end_tag("do_pop") 
 
 
 
@@ -838,6 +870,10 @@ class Parser:
         self.do_jg()
       elif self.get_value()=="jge":
         self.do_jge()
+      elif self.get_value()=="push":
+        self.do_push()
+      elif self.get_value()=="pop":
+        self.do_pop()
       elif self.get_value()=="int":
         self.do_int()
       elif self.get_value()=="flt":
