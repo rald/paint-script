@@ -1,0 +1,148 @@
+# 1 "a000"
+# 1 "<built-in>" 1
+# 1 "<built-in>" 3
+# 386 "<built-in>" 3
+# 1 "<command line>" 1
+# 1 "<built-in>" 2
+# 1 "a000" 2
+tokens
+globals
+
+# 1 "./fac0" 1
+set ax 0
+set pi 3.1415926
+
+set turtle_heading 0
+set turtle_x 320
+set turtle_y 240
+
+set pen_color 12
+set pen_down true
+set pen_size 3
+
+set move_dist 0
+set move_heading 0
+
+set new_x 0
+set new_y 0
+set turn_angle 0
+set star_size 0
+# 27 "./fac0"
+:d2r
+  pop ax
+  mul ax pi
+  div ax 180
+  push ax
+  ret
+# 42 "./fac0"
+:move
+  pop move_dist
+
+  call d2r turtle_heading
+  pop move_heading
+
+  set new_x move_heading
+  cos new_x new_x
+  mul new_x move_dist
+  add new_x turtle_x
+
+  set new_y move_heading
+  sin new_y new_y
+  mul new_y move_dist
+  add new_y turtle_y
+
+  je move10 pen_down false
+
+    line turtle_x turtle_y new_x new_y pen_color pen_size
+
+  :move10
+
+  set turtle_x new_x
+  set turtle_y new_y
+
+  ret
+# 76 "./fac0"
+:turn
+  pop turn_angle
+  add turtle_heading turn_angle
+  ret
+
+
+
+
+
+
+:jump
+  pop turtle_y turtle_x
+  ret
+# 5 "a000" 2
+
+debug 1
+
+set rx 0
+set ry 0
+set rs 0
+set rw 0
+set rh 0
+
+set mc 0
+
+
+
+jmp main
+
+
+
+
+
+
+
+:star
+  pop star_size
+
+  set c 5
+  :forc
+
+    call move star_size
+
+    push 144
+    call turn
+
+    sub c 1
+
+    jge forc c 0
+
+  ret
+
+
+
+
+
+:main
+
+  clear 0
+
+  set mc 10
+
+  :for_mc
+
+    rnd rs 50 200
+
+    set rw 640
+    sub rw rs
+
+    set rh 480
+    sub rh rs
+
+    rnd rx rs rw
+    rnd ry rs rh
+
+    call jump rx ry
+
+    call star rs
+
+    sub mc 1
+
+    jge for_mc mc 0
+
+end

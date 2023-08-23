@@ -1,0 +1,76 @@
+debug 1
+tokens
+globals
+
+#include "fac0"
+
+set rx 0
+set ry 0
+set rs 0
+set rw 0
+set rh 0
+
+set mc 0
+
+
+
+jmp main
+
+
+
+/*  
+    star size
+    draws a star
+*/
+:star
+  pop star_size
+  
+  set c 5
+  :forc 
+  
+    call move star_size
+
+    push 144
+    call turn
+
+    sub c 1
+    
+    jge forc c 0
+
+  ret
+
+
+/*
+    main
+*/
+:main
+
+  clear 0
+
+  set mc 10
+
+  :for_mc
+
+    rnd rs 50 200
+
+    set rw 640
+    sub rw rs
+
+    set rh 480
+    sub rh rs
+
+    rnd rx rs rw
+    rnd ry rs rh
+
+    call jump rx ry
+
+    call star rs
+
+    sub mc 1
+
+    jge for_mc mc 0
+
+end
+
+
+

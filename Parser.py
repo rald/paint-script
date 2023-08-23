@@ -25,7 +25,7 @@ class Parser:
     self.glo={}
     self.quit=False
 
-    self.glo["DBG"]=Token(0,0,TokenType.INTEGER,0)
+    self.glo["DBG"]=Token(0,0,TokenType.INTEGER,1)
     self.glo["RET"]=[]
     self.glo["STK"]=[]
 
@@ -60,7 +60,7 @@ class Parser:
   def begin_tag(self,tag):
     if self.glo["DBG"].value==1:
       print("  "*self.indent,end="")   
-      print(f"</{tag}>")
+      print(f"<{tag}>")
     self.indent+=1
 
 
@@ -822,9 +822,8 @@ class Parser:
 
 
   def do_debug(self):
-    result=None
     self.check(TokenType.IDENT,"debug")
-    self.glo["DBG"]=self.get_integer()
+    self.glo["DBG"]=self.get_any()
 
 
 
@@ -839,10 +838,10 @@ class Parser:
 
   def do_tokens(self):
     self.begin_tag("do_tokens") 
-    self.check(TokenType.IDENT,"do_tokens")
+    self.check(TokenType.IDENT,"tokens")
     for i in range(len(self.tokens)):
       print(i,self.tokens[i])
-    self.end_tag("do_tokenss") 
+    self.end_tag("do_tokens") 
 
 
 

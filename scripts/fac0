@@ -1,5 +1,3 @@
-#!/usr/bin/env paint
-
 set ax 0
 set pi 3.1415926
 
@@ -19,27 +17,13 @@ set new_y 0
 set turn_angle 0
 set star_size 0
 
-set rx 0
-set ry 0
-set rs 0
-set rw 0
-set rh 0
-
-set mc 0
 
 
-
-
-
-
-
-jmp main
-
-
-
-# d2r deg
-# degrees to radians
-# returns radian
+/*
+    d2r deg
+    degrees to radians
+    returns radian
+*/
 :d2r
   pop ax
   mul ax pi
@@ -48,12 +32,13 @@ jmp main
   ret
 
 
-
-# move dist
-# moves dist pixels
-# if dist is positive forward 
-# if dist is negative backward
-# if pen_down is true it draws a line with pen_color
+/*
+    move dist
+    moves dist pixels
+    if dist is positive forward 
+    if dist is negative backward
+    if pen_down is true it draws a line with pen_color
+*/
 :move
   pop move_dist
   
@@ -82,78 +67,26 @@ jmp main
   ret
 
 
-
-# turn angle
-# turns angle degrees
-# if angle is positive clockwise
-# if angle is negative counter clockwise
+/*
+    turn angle
+    turns angle degrees
+    if angle is positive clockwise
+    if angle is negative counter clockwise
+*/
 :turn
   pop turn_angle
   add turtle_heading turn_angle
   ret
 
 
-
-# jump x y
-# jumps to location x,y
+/*
+    jump x y
+    jumps to location x,y
+*/
 :jump
   pop turtle_y turtle_x
-  ret  
-
-
-
-
-
-
-# star size
-# draws a star
-:star
-  pop star_size
-  
-  set c 5
-  :forc 
-  
-    call move star_size
-
-    push 144
-    call turn
-
-    sub c 1
-    
-    jge forc c 0
-
   ret
 
-
-
-:main
-
-  clear 0
-
-  set mc 10
-
-  :for_mc
-
-    rnd rs 50 200
-
-    set rw 640
-    sub rw rs
-
-    set rh 480
-    sub rh rs
-
-    rnd rx rs rw
-    rnd ry rs rh
-
-    call jump rx ry
-
-    call star rs
-
-    sub mc 1
-
-    jge for_mc mc 0
-
-end
 
 
 
