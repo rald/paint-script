@@ -10,22 +10,21 @@ class TokenType(Enum):
 
   IDENT = 6
 
-  OPEN_PAREN = 7
-  CLOSE_PAREN = 8
-
-  OPEN_BRACKET = 9
-  CLOSE_BRACKET = 10
-
   COLON = 11
-  NEW_LINE = 12
+  SEMI_COLON = 12
+  NEW_LINE = 13
   
-  LABEL = 13
+  LABEL = 14
 
-  AT = 14
-  DOLLAR = 15
-  PERCENT = 16
+  AT = 15
+  DOLLAR = 16
+  PERCENT = 17
 
-  COMMENT = 17
+  COMMENT = 18
 
-  EOF = 18
+  EOF = 19
+
+
+
+
 

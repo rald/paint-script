@@ -3,6 +3,9 @@ from Token import Token
 from TokenType import TokenType
 
 class Lexer(object):
+
+
+
   @staticmethod
   def lex(s):
     quit=False
@@ -29,17 +32,21 @@ class Lexer(object):
           tokens.append(Token(ln,cl,TokenType.SEMICOLON,c))
         elif c==':':
           state=LexerState.LABEL
-        elif c=='@':
-          tokens.append(Token(ln,cl,TokenType.AT,c))  
-        elif c=='$':
-          tokens.append(Token(ln,cl,TokenType.DOLLAR,c))  
-        elif c=='%':
-          tokens.append(Token(ln,cl,TokenType.PERCENT,c))  
         elif c=='#':
           scl=cl
           i-=1
           cl-=1
           state=LexerState.COMMENT
+        elif i<len(s)-1 and s[i]=="/" and s[i+1]=="/":
+          scl=cl
+          i-=1
+          cl-=1
+          state=LexerState.COMMENT
+        elif (i<len(s)-1 and s[i]=="/" and s[i+1]=="*"):
+          scl=cl
+          i-=1
+          cl-=1
+          state=LexerState.MULTILINE_COMMENT 
         elif c=='\n':
           tokens.append(Token(ln,cl,TokenType.NEW_LINE,c))  
           ln+=1
@@ -91,11 +98,11 @@ class Lexer(object):
         if c.isalnum() or c=='_':
           text+=c
         else:
-          if text=='None':
+          if text=='none':
             tokens.append(Token(ln,scl,TokenType.NONE,None))
-          elif text=='False':
+          elif text=='false':
             tokens.append(Token(ln,scl,TokenType.FALSE,False))
-          elif text=='True':
+          elif text=='true':
             tokens.append(Token(ln,scl,TokenType.TRUE,True))
           else:
             tokens.append(Token(ln,scl,TokenType.IDENT,text))
@@ -126,6 +133,15 @@ class Lexer(object):
           cl-=1
           state=LexerState.DEFAULT       
 
+      elif state==LexerState.MULTILINE_COMMENT:
+        
+        if i<len(s)-1 and not (s[i]=="*" and s[i+1]=="/"):
+          text+=c+"*/"
+        else:
+          tokens.append(Token(ln,scl,TokenType.COMMENT,text))
+          text=""
+          state=LexerState.DEFAULT       
+
       elif state==LexerState.QUIT:
         quit=True
 
@@ -138,3 +154,9 @@ class Lexer(object):
     tokens.append(Token(ln,cl,TokenType.EOF,None))
 
     return tokens  
+
+
+
+
+
+

@@ -488,7 +488,7 @@ class Parser:
     label=self.get_label_check()
 
     while self.get_type() not in [TokenType.SEMI_COLON,TokenType.NEW_LINE,TokenType.EOF]:
-      self.glo["STK"].append(self.get_any())
+      self.glo["STK"].push(self.get_any())
 
     self.glo["RET"].append(self.pc)
     self.pc=self.glo["LAB_"+label.value].value

@@ -25,9 +25,10 @@ class Parser:
     self.glo={}
     self.quit=False
 
-    self.glo["DBG"]=Token(0,0,TokenType.INTEGER,0)
+    self.glo["debug"]=Token(0,0,TokenType.INTEGER,0)
     self.glo["RET"]=[]
     self.glo["STK"]=[]
+    self.glo["FUN"]="FUN"
 
     self.indent=0
 
@@ -53,12 +54,12 @@ class Parser:
       self.error("input past end of file")
     else:
       self.pc+=1
-      if self.glo["DBG"].value==1: print("pc",self.pc)
+      if self.glo["debug"].value==1: print("pc",self.pc)
 
 
 
   def begin_tag(self,tag):
-    if self.glo["DBG"].value==1:
+    if self.glo["debug"].value==1:
       print("  "*self.indent,end="")   
       print(f"</{tag}>")
     self.indent+=1
@@ -67,7 +68,7 @@ class Parser:
 
   def end_tag(self,tag):
     self.indent-=1
-    if self.glo["DBG"].value==1:
+    if self.glo["debug"].value==1:
       print("  "*self.indent,end="")   
       print(f"</{tag}>")
 
@@ -342,7 +343,7 @@ class Parser:
     else:
       token2=self.get_atom()
     result=token2
-    while self.get_type() not in [TokenType.SEMI_COLON,TokenType.NEW_LINE,TokenType.EOF]:
+    while self.get_type() not in [TokenType.NEW_LINE,TokenType.EOF]:
       if self.get_type()==TokenType.IDENT:
         token2=self.get_ident_check()
         token2=self.glo["VAR_"+token2.value]
@@ -486,10 +487,6 @@ class Parser:
     self.begin_tag("do_call")
     self.check(TokenType.IDENT,"call")
     label=self.get_label_check()
-
-    while self.get_type() not in [TokenType.SEMI_COLON,TokenType.NEW_LINE,TokenType.EOF]:
-      self.glo["STK"].append(self.get_any())
-
     self.glo["RET"].append(self.pc)
     self.pc=self.glo["LAB_"+label.value].value
     self.end_tag("do_call") 
@@ -517,8 +514,8 @@ class Parser:
     self.begin_tag("do_je")
     self.check(TokenType.IDENT,"je")
     token1=self.get_label_check()
-    token2=self.get_any()
-    token3=self.get_any()
+    token2=self.get_number()
+    token3=self.get_number()
     if token2.value==token3.value:
       self.pc=self.glo["LAB_"+token1.value].value
     self.end_tag("do_je") 
@@ -529,8 +526,8 @@ class Parser:
     self.begin_tag("do_jne")
     self.check(TokenType.IDENT,"jne")
     token1=self.get_label_check()
-    token2=self.get_any()
-    token3=self.get_any()
+    token2=self.get_number()
+    token3=self.get_number()
     if token2.value!=token3.value:
       self.pc=self.glo["LAB_"+token1.value].value
     self.end_tag("do_je") 
@@ -541,8 +538,8 @@ class Parser:
     self.begin_tag("do_jl")
     self.check(TokenType.IDENT,"jl")
     token1=self.get_label_check()
-    token2=self.get_any()
-    token3=self.get_any()
+    token2=self.get_number()
+    token3=self.get_number()
     if token2.value<token3.value:
       self.pc=self.glo["LAB_"+token1.value].value
     self.end_tag("do_je") 
@@ -553,8 +550,8 @@ class Parser:
     self.begin_tag("do_jle")
     self.check(TokenType.IDENT,"jle")
     token1=self.get_label_check()
-    token2=self.get_any()
-    token3=self.get_any()
+    token2=self.get_number()
+    token3=self.get_number()
     if token2.value<=token3.value:
       self.pc=self.glo["LAB_"+token1.value].value
     self.end_tag("do_jle") 
@@ -565,8 +562,8 @@ class Parser:
     self.begin_tag("do_jg")
     self.check(TokenType.IDENT,"jg")
     token1=self.get_label_check()
-    token2=self.get_any()
-    token3=self.get_any()
+    token2=self.get_number()
+    token3=self.get_number()
     if token2.value>token3.value:
       self.pc=self.glo["LAB_"+token1.value].value
     self.end_tag("do_jg") 
@@ -577,8 +574,8 @@ class Parser:
     self.begin_tag("do_jge")
     self.check(TokenType.IDENT,"jge")
     token1=self.get_label_check()
-    token2=self.get_any()
-    token3=self.get_any()
+    token2=self.get_number()
+    token3=self.get_number()
     if token2.value>=token3.value:
       self.pc=self.glo["LAB_"+token1.value].value
     self.end_tag("do_jge") 
@@ -588,7 +585,7 @@ class Parser:
   def do_push(self):
     self.begin_tag("do_push")
     self.check(TokenType.IDENT,"push") 
-    while self.get_type() not in [TokenType.SEMI_COLON,TokenType.NEW_LINE,TokenType.EOF]:
+    while self.get_type() not in [TokenType.NEW_LINE,TokenType.EOF]:
       token=self.get_any()
       self.glo["STK"].append(token)
     self.end_tag("do_push") 
@@ -598,7 +595,7 @@ class Parser:
   def do_pop(self):
     self.begin_tag("do_pop")
     self.check(TokenType.IDENT,"pop") 
-    while self.get_type() not in [TokenType.SEMI_COLON,TokenType.NEW_LINE,TokenType.EOF]:
+    while self.get_type() not in [TokenType.NEW_LINE,TokenType.EOF]:
       ident=self.get_ident_check()
       self.glo["VAR_"+ident.value]=self.glo["STK"].pop()
     self.end_tag("do_pop") 
@@ -629,7 +626,7 @@ class Parser:
     self.begin_tag("do_str")
     self.check(TokenType.IDENT,"str")
     token1=self.get_ident_check()
-    token2=self.get_any()
+    token2=self.get_number()
     self.glo["VAR_"+token1.value]=Token(0,0,TokenType.STRING,str(token2.value))
     self.end_tag("do_str") 
 
@@ -639,8 +636,8 @@ class Parser:
     self.begin_tag("do_rnd")
     self.check(TokenType.IDENT,"rnd")
     token1=self.get_ident_check()
-    token2=self.get_ident_integer()
-    token3=self.get_ident_integer()
+    token2=self.get_number()
+    token3=self.get_number()
     self.glo["VAR_"+token1.value]=Token(0,0,TokenType.INTEGER,random.randint(token2.value,token3.value))
     self.end_tag("do_rnd") 
 
@@ -683,7 +680,7 @@ class Parser:
     y=self.get_number().value
     s=self.get_number().value
     f=self.get_number().value
-    if self.glo["DBG"].value==1: print(f"pset {x} {y} {s} {f}")
+    print(f"pset {x} {y} {s} {f}")
     self.draw.rectangle((x*s,y*s,x*s+s,y*s+s),fill=pal[f])
     self.end_tag("do_pset") 
 
@@ -698,7 +695,7 @@ class Parser:
     y1=self.get_number().value
     f=self.get_number_or_none().value
     w=self.get_number().value
-    if self.glo["DBG"].value==1: print(f"line {x0} {y0} {x1} {y1} {f} {w}")
+    print(f"line {x0} {y0} {x1} {y1} {f} {w}")
     self.draw.line((x0,y0,x1,y1),fill=None if f is None else pal[f],width=w)
     self.end_tag("do_line") 
 
@@ -714,7 +711,7 @@ class Parser:
     f=self.get_number_or_none().value
     o=self.get_number_or_none().value
     w=self.get_number().value
-    if self.glo["DBG"].value==1: print(f"oval {x0} {y0} {x1} {y1} {f} {o} {w}")
+    print(f"oval {x0} {y0} {x1} {y1} {f} {o} {w}")
     self.draw.ellipse((x0,y0,x1,y1),fill=None if f is None else pal[f],outline=None if o is None else pal[o],width=w)
     self.end_tag("do_oval") 
 
@@ -730,7 +727,7 @@ class Parser:
     f=self.get_number_or_none().value
     o=self.get_number_or_none().value
     w=self.get_number().value
-    if self.glo["DBG"].value==1: print(f"rect {x0} {y0} {x1} {y1} {f} {o} {w}")
+    print(f"rect {x0} {y0} {x1} {y1} {f} {o} {w}")
     self.draw.rectangle((x0,y0,x1,y1),fill=None if f is None else pal[f],outline=None if o is None else pal[o],width=w)
     self.end_tag("do_rect") 
 
@@ -747,7 +744,7 @@ class Parser:
     e=self.get_number().value       
     f=self.get_number_or_none().value
     w=self.get_number().value
-    if self.glo["DBG"].value==1: print(f"arc {x0} {y0} {x1} {y1} {f} {o} {w}")
+    print(f"arc {x0} {y0} {x1} {y1} {f} {o} {w}")
     self.draw.rectangle((x0,y0,x1,y1),start=s,end=e,fill=None if f is None else pal[f],width=w)    
     self.end_tag("do_arc") 
 
@@ -764,7 +761,7 @@ class Parser:
     e=self.get_number().value       
     f=self.get_number_or_none().value
     w=self.get_number().value
-    if self.glo["DBG"].value==1: print(f"chord {x0} {y0} {x1} {y1} {f} {o} {w}")
+    print(f"chord {x0} {y0} {x1} {y1} {f} {o} {w}")
     self.draw.chord((x0,y0,x1,y1),start=s,end=e,fill=None if f is None else pal[f],width=w)    
     self.end_tag("do_chord") 
 
@@ -781,7 +778,7 @@ class Parser:
     e=self.get_number().value       
     f=self.get_number_or_none().value
     w=self.get_number().value
-    if self.glo["DBG"].value==1: print(f"pie {x0} {y0} {x1} {y1} {f} {o} {w}")
+    print(f"pie {x0} {y0} {x1} {y1} {f} {o} {w}")
     self.draw.pieslice((x0,y0,x1,y1),start=s,end=e,fill=None if f is None else pal[f],width=w)    
     self.end_tag("do_pie") 
 
@@ -792,7 +789,7 @@ class Parser:
     self.check(TokenType.IDENT,"poly")
     start=self.pc
     count=0
-    while self.get_type() not in [TokenType.SEMI_COLON,TokenType.NEW_LINE,TokenType.EOF]:
+    while self.get_type() not in [TokenType.NEW_LINE,TokenType.EOF]:
       count+=1
     self.pc=start
     p=[]
@@ -804,7 +801,7 @@ class Parser:
     f=self.get_number_or_none().value
     o=self.get_number_or_none().value
     w=self.get_number().value
-    if self.glo["DBG"].value==1: print(f"poly {p} {f} {o} {w}")
+    print(f"poly {p} {f} {o} {w}")
     self.draw.polygon(p,fill=None if f is None else pal[f],outline=None if o is None else pal[o],width=w)
     self.end_tag("do_poly") 
 
@@ -815,7 +812,7 @@ class Parser:
     self.check(TokenType.IDENT,"clear")
     f=self.get_number().value
     w,h=self.img.size
-    if self.glo["DBG"].value==1: print(f"clear {f}")
+    print(f"clear {f}")
     self.draw.rectangle((0,0,w,h),fill=pal[f])
     self.end_tag("do_clear") 
 
@@ -824,7 +821,7 @@ class Parser:
   def do_debug(self):
     result=None
     self.check(TokenType.IDENT,"debug")
-    self.glo["DBG"]=self.get_integer()
+    self.glo["debug"]=self.get_integer()
 
 
 
@@ -834,15 +831,6 @@ class Parser:
     for key in self.glo:
       print(key,"=",self.glo[key])
     self.end_tag("do_globals") 
-
-
-
-  def do_tokens(self):
-    self.begin_tag("do_tokens") 
-    self.check(TokenType.IDENT,"do_tokens")
-    for i in range(len(self.tokens)):
-      print(i,self.tokens[i])
-    self.end_tag("do_tokenss") 
 
 
 
@@ -951,8 +939,6 @@ class Parser:
         self.do_debug()
       elif self.get_value()=="globals":
         self.do_globals()
-      elif self.get_value()=="tokens":
-        self.do_tokens()
       elif self.get_value()=="datetime":
         self.do_datetime()
       elif self.get_value()=="end":
@@ -971,15 +957,19 @@ class Parser:
 
     self.load_labels()
 
+    """
+    for i in range(len(self.tokens)):
+      print(i,self.tokens[i])
+    """
+
     while not self.quit and not self.get_type()==TokenType.EOF:
 
-      while self.get_type() in [TokenType.SEMI_COLON,TokenType.NEW_LINE,TokenType.LABEL,TokenType.COMMENT]:
+      while self.get_type() in [TokenType.NEW_LINE,TokenType.LABEL,TokenType.COMMENT]:
         self.next()
 
       self.eval()
 
     self.img.save(self.image_path)
-
 
 
 

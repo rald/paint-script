@@ -7,4 +7,6 @@ class LexerState(Enum):
   IDENT = 3
   LABEL = 4
   COMMENT = 5
-  QUIT = 6
+  SLASH_COMMENT = 6
+  MULTILINE_COMMENT = 7 
+  QUIT = 8

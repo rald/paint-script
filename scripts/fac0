@@ -1,39 +1,121 @@
-set pi 3.1416
+#!/usr/bin/env paint
 
-set f 12
-set w 3
+set ax 0
+set pi 3.1415926
 
-set h 0
-set x 320
-set y 240
+set turtle_heading 0
+set turtle_x 320
+set turtle_y 240
 
-set dr 0
-set md 0
-set mh 0
-set ta 0
-set sd 0
+set pen_color 12
+set pen_down true
+set pen_size 3
+
+set move_dist 0
+set move_heading 0
+
+set new_x 0
+set new_y 0
+set turn_angle 0
+set star_size 0
+
+set rx 0
+set ry 0
+set rs 0
+set rw 0
+set rh 0
+
+set mc 0
 
 
-:main
-  clear 0
-
-  push 100
-  call star
-
-  end
 
 
 
+
+
+jmp main
+
+
+
+# d2r deg
+# degrees to radians
+# returns radian
+:d2r
+  pop ax
+  mul ax pi
+  div ax 180  
+  push ax
+  ret
+
+
+
+# move dist
+# moves dist pixels
+# if dist is positive forward 
+# if dist is negative backward
+# if pen_down is true it draws a line with pen_color
+:move
+  pop move_dist
+  
+  call d2r turtle_heading   
+  pop move_heading
+
+  set new_x move_heading 
+  cos new_x new_x
+  mul new_x move_dist
+  add new_x turtle_x
+
+  set new_y move_heading
+  sin new_y new_y
+  mul new_y move_dist
+  add new_y turtle_y
+
+  je move10 pen_down false
+  
+    line turtle_x turtle_y new_x new_y pen_color pen_size 
+
+  :move10
+
+  set turtle_x new_x
+  set turtle_y new_y
+
+  ret
+
+
+
+# turn angle
+# turns angle degrees
+# if angle is positive clockwise
+# if angle is negative counter clockwise
+:turn
+  pop turn_angle
+  add turtle_heading turn_angle
+  ret
+
+
+
+# jump x y
+# jumps to location x,y
+:jump
+  pop turtle_y turtle_x
+  ret  
+
+
+
+
+
+
+# star size
+# draws a star
 :star
-  pop sd
+  pop star_size
   
   set c 5
   :forc 
   
-    push sd
-    call move
+    call move star_size
 
-    push 144 
+    push 144
     call turn
 
     sub c 1
@@ -44,45 +126,36 @@ set sd 0
 
 
 
-:d2r
-  pop dr
-  mul dr pi
-  div dr 180  
-  push dr
-  ret
+:main
+
+  clear 0
+
+  set mc 10
+
+  :for_mc
+
+    rnd rs 50 200
+
+    set rw 640
+    sub rw rs
+
+    set rh 480
+    sub rh rs
+
+    rnd rx rs rw
+    rnd ry rs rh
+
+    call jump rx ry
+
+    call star rs
+
+    sub mc 1
+
+    jge for_mc mc 0
+
+end
 
 
-
-:move
-  pop md
-  
-  push h
-  call d2r   
-  pop mh
-
-  set nx mh 
-  cos nx nx
-  mul nx md
-  add nx x
-
-  set ny mh
-  sin ny ny
-  mul ny md
-  add ny y
-
-  line x y nx ny f w 
-
-  set x nx
-  set y ny
-
-  ret
-
-
-
-:turn
-  pop ta
-  add h ta
-  ret
 
 
 
