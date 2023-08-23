@@ -1,35 +1,16 @@
-set ax 0
-set pi 3.1415926
-
-set turtle_heading 0
-set turtle_x 320
-set turtle_y 240
-
-set pen_color 12
-set pen_down true
-set pen_size 3
-
-set move_dist 0
-set move_heading 0
-
-set new_x 0
-set new_y 0
-set turn_angle 0
-set star_size 0
-
-
-
 /*
     d2r deg
     degrees to radians
     returns radian
 */
+
 :d2r
   pop ax
   mul ax pi
   div ax 180  
   push ax
   ret
+
 
 
 /*
@@ -39,6 +20,7 @@ set star_size 0
     if dist is negative backward
     if pen_down is true it draws a line with pen_color
 */
+
 :move
   pop move_dist
   
@@ -73,6 +55,7 @@ set star_size 0
     if angle is positive clockwise
     if angle is negative counter clockwise
 */
+
 :turn
   pop turn_angle
   add turtle_heading turn_angle
@@ -83,10 +66,10 @@ set star_size 0
     jump x y
     jumps to location x,y
 */
+
 :jump
   pop turtle_y turtle_x
   ret
-
 
 
 

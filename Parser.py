@@ -25,7 +25,7 @@ class Parser:
     self.glo={}
     self.quit=False
 
-    self.glo["DBG"]=Token(0,0,TokenType.INTEGER,1)
+    self.glo["DBG"]=Token(0,0,TokenType.INTEGER,0)
     self.glo["RET"]=[]
     self.glo["STK"]=[]
 
