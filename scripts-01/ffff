@@ -1,0 +1,27 @@
+set r 10
+set cx 320
+set cy 240
+set x0 cx
+set y0 cy
+set x1 cx
+set y1 cy
+
+set p r
+mul p 16
+sub x0 p
+sub y0 p
+add x1 p
+add y1 p
+
+set f 0
+set i 16
+clear 0
+:start
+  oval x0 y0 x1 y1 f None 0
+  add x0 r
+  add y0 r
+  sub x1 r
+  sub y1 r
+  add f 1  
+  sub i 1
+  jg start i 0

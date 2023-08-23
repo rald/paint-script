@@ -28,7 +28,6 @@ class Parser:
     self.glo["debug"]=Token(0,0,TokenType.INTEGER,0)
     self.glo["RET"]=[]
     self.glo["STK"]=[]
-    self.glo["FUN"]="FUN"
 
     self.indent=0
 
@@ -74,7 +73,7 @@ class Parser:
 
 
   
-  def load_labels(self):
+  def read_labels(self):
     for i in range(len(self.tokens)):
       if self.tokens[i].type==TokenType.LABEL:
         label=self.tokens[i]
@@ -301,7 +300,7 @@ class Parser:
       
 
   def get_any(self):
-    self.begin_tag("get_any")
+    self.begin_tag("get_number_or_none")
     result=Token(0,0,TokenType.NONE,None)
     if self.get_type()==TokenType.IDENT:
       ident=self.get_ident_check()
@@ -311,25 +310,9 @@ class Parser:
       self.next()
     else:
       self.error(f"found {self.get_type()} expected VALUE")
-    self.end_tag("get_any") 
+    self.end_tag("get_number") 
     return result
 
-
-
-  def get_ident_integer(self):
-    self.begin_tag("get_ident_integer")
-    result=Token(0,0,TokenType.NONE,None)
-    if self.get_type()==TokenType.IDENT:
-      ident=self.get_ident_check()
-      result=self.glo["VAR_"+ident.value]
-      if result.type!=TokenType.INTEGER:
-        self.error(f"found {result.type} expected INTEGER")
-    elif self.get_type()==TokenType.INTEGER: 
-      result=self.get_integer()
-    else:
-      self.error(f"found {self.get_type()} expected INTEGER")
-    self.end_tag("get_ident_integer") 
-    return result
 
 
   def do_set(self):
@@ -350,7 +333,7 @@ class Parser:
       else:
         token2=self.get_atom()
       result=Token(0,0,TokenType.STRING,str(result.value)+str(token2.value))
-    self.glo["VAR_"+token1.value]=result     
+    self.glo["VAR_"+token1.value]=result      
     self.end_tag("do_set") 
 
 
@@ -955,7 +938,7 @@ class Parser:
 
   def parse(self):
 
-    self.load_labels()
+    self.read_labels()
 
     """
     for i in range(len(self.tokens)):

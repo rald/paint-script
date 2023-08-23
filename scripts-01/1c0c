@@ -1,0 +1,218 @@
+set r 64
+set rr r
+mul rr 2
+
+set cx 640
+set cy 480
+
+set t r 
+mul t 7
+sub cx t
+div cx 2
+int cx cx
+set t r
+mul t 3
+sub cy t
+div cy 2
+int cy cy
+set ox cx
+set oy cy
+
+
+set Y 0
+set M 0
+set D 0
+set h 0
+set m 0
+set s 0
+set ms 0
+
+clear 0
+
+:c10
+datetime Y M D h m s ms
+
+set x 0
+set y 0
+set b h
+globals
+mod b 12
+call d10
+
+set rrr rr
+mul rrr 2
+
+set x rrr
+set y 0
+set b m
+div b 5
+int b b
+call d10
+
+globals
+end
+
+
+:d10
+add x ox
+add y oy
+
+je b0 b 0
+je b1 b 1
+je b2 b 2
+je b3 b 3
+je b4 b 4
+je b5 b 5
+je b6 b 6
+je b7 b 7
+je b8 b 8
+je b9 b 9
+je b10 b 10
+je b11 b 11
+end
+
+:b0
+set f0 0
+set f1 0
+set f2 0
+set f3 0
+jmp draw
+
+:b1
+set f0 12
+set f1 0
+set f2 0
+set f3 0
+jmp draw
+
+:b2
+set f0 0
+set f1 12
+set f2 0
+set f3 0
+jmp draw
+
+:b3
+set f0 0
+set f1 0
+set f2 12
+set f3 0
+jmp draw
+
+:b4
+set f0 0
+set f1 0
+set f2 0
+set f3 12
+jmp draw
+
+:b5
+set f0 12
+set f1 12
+set f2 0
+set f3 0
+jmp draw
+
+:b6
+set f0 0
+set f1 12
+set f2 12
+set f3 0
+jmp draw
+
+:b7
+set f0 0
+set f1 0
+set f2 12
+set f3 12
+jmp draw
+
+:b8
+set f0 12
+set f1 0
+set f2 0
+set f3 12
+jmp draw
+
+:b9
+set f0 12
+set f1 0
+set f2 12
+set f3 0
+jmp draw
+
+:b10
+set f0 0
+set f1 12
+set f2 0
+set f3 12
+jmp draw
+
+:b11
+set f0 12
+set f1 12
+set f2 12
+set f3 12
+jmp draw
+
+
+:draw
+
+set x0 x
+set y0 y
+
+set x1 x
+add x1 rr
+set y1 y
+
+set x2 x
+add x2 rr
+set y2 y
+add y2 rr
+
+set x3 x
+set y3 y
+add y3 rr
+
+set xl x0
+set xt y0
+set xr x0
+set xb y0
+add xr r
+add xb r
+set f f0
+call o
+
+set xl x1
+set xt y1
+set xr x1
+set xb y1
+add xr r
+add xb r
+set f f1
+call o
+
+set xl x2
+set xt y2
+set xr x2
+set xb y2
+add xr r
+add xb r
+set f f2
+call o
+
+set xl x3
+set xt y3
+set xr x3
+set xb y3
+add xr r
+add xb r
+set f f3
+call o
+
+ret
+
+:o
+oval xl xt xr xb f 5 2
+ret
+
